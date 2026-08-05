@@ -24,6 +24,11 @@ nebula-blue accent, and an optional macOS-like layout.
 - A KWin rule that hides the
   [Xwayland Video Bridge ghost window](https://bugs.kde.org/show_bug.cgi?id=473946)
   (the 1×1 px artifact visible at the screen edge)
+- **Optional Konsole theme** — the [Dracula](https://draculatheme.com) color
+  scheme and profile (with the Hack font), set as the default profile
+- **Optional editor theme** — the official
+  [Dracula extension](https://marketplace.visualstudio.com/items?itemName=dracula-theme.theme-dracula)
+  installed into VS Code and/or VSCodium when detected
 
 ## Install
 
@@ -48,7 +53,11 @@ HIDE_XWVB=yes CYCLE=no MODE=dark bash install.sh
 | `MACOS_LAYOUT` | `yes` / `no`                    | `yes`    | Top bar + centered floating dock               |
 | `HIDE_XWVB`    | `yes` / `no`                    | `yes`    | Hide the Xwayland Video Bridge ghost window    |
 | `CYCLE`        | `yes` / `no`                    | `no`     | Automatic day/night switching                  |
+| `KONSOLE`      | `yes` / `no`                    | `yes`    | Dracula color scheme + profile for Konsole     |
+| `DRACULA`      | `yes` / `no`                    | `yes`*   | Dracula extension for VS Code/VSCodium         |
 | `MODE`         | `dark` / `light` / `auto`       | `dark`   | Mode applied at the end of the install         |
+
+\* only offered when `code` or `codium` is found on the machine.
 
 Log out and back in afterwards so every application picks up the fonts and
 widget style.
@@ -90,9 +99,18 @@ rm -rf ~/.local/share/color-schemes/Debianadera*.colors \
   windows opaque and only makes menus/popups translucent (which does work).
 - The global menu in the top bar only fills in for applications that export
   their menu (KDE/Qt apps do; Chrome, Electron and most GTK apps do not).
-- The wallpaper is downloaded from wallhaven at install time and is **not**
-  redistributed in this repository — see its
-  [wallhaven page](https://wallhaven.cc/w/mlgmjm) for author and license.
+## Credits
+
+- **Wallpaper**: mirrored in [`assets/`](assets/) so the theme keeps working if
+  the source goes away — original found on
+  [wallhaven (mlgmjm)](https://wallhaven.cc/w/mlgmjm); all rights remain with
+  its author, see the source page for details.
+- **[Dracula](https://draculatheme.com)** Konsole scheme and editor extension —
+  MIT licensed, by Zeno Rocha and contributors.
+- **[Tela-circle icons](https://github.com/vinceliuice/Tela-circle-icon-theme)**
+  by vinceliuice, cloned from the official repository at install time.
+- **[Kvantum](https://github.com/tsujan/Kvantum)** by Tsu Jan — the Debianadera
+  widget themes are generated locally from its KvFlat/KvFlatLight themes.
 
 ## License
 

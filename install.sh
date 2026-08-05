@@ -14,7 +14,7 @@
 #          Run as your normal user (sudo is only invoked for apt).
 #          Every choice can be preseeded via environment variables, e.g.:
 #          WALLPAPER=nebula ICONS=yes MACOS_LAYOUT=yes BUTTONS_LEFT=yes \
-#          CYCLE=no MODE=dark bash install.sh
+#          CYCLE=no KONSOLE=yes DRACULA=yes MODE=dark bash install.sh
 #
 # What it touches (all user-level, nothing outside $HOME except apt):
 #   ~/.local/share/color-schemes/Debianadera{Light,Dark}.colors
@@ -60,6 +60,9 @@ ask() {
 command -v plasmashell   >/dev/null || die "plasmashell not found — is this a KDE Plasma session?"
 command -v kwriteconfig6 >/dev/null || die "kwriteconfig6 not found — KDE Plasma 6 is required."
 
+# Where the repository's own assets live (wallpaper mirror, Konsole themes)
+RAW_BASE="https://raw.githubusercontent.com/Nedara-Project/debianedara/main"
+
 PLASMA_VERSION=$(plasmashell --version | grep -oE '[0-9]+\.[0-9]+' | head -1)
 info "Detected Plasma $PLASMA_VERSION"
 [[ "${PLASMA_VERSION%%.*}" == "6" ]] || warn "This theme targets Plasma 6.x — continuing anyway."
@@ -82,6 +85,12 @@ ask BUTTONS_LEFT "Move window buttons to the left, macOS order (close/min/max)?"
 ask MACOS_LAYOUT "Apply the macOS-like panel layout (thin top bar + centered dock)?"     yes
 ask HIDE_XWVB    "Hide the Xwayland Video Bridge ghost window (fixes edge artifact)?"    yes
 ask CYCLE        "Enable the automatic day/night cycle (light 07:00-19:00)?"             no
+ask KONSOLE      "Install the Dracula color scheme and profile for Konsole?"             yes
+if command -v code >/dev/null || command -v codium >/dev/null; then
+    ask DRACULA  "Install the Dracula theme extension in VS Code/VSCodium?"              yes
+else
+    DRACULA=no
+fi
 if [[ -z "${MODE:-}" ]]; then
     if [[ -t 0 ]]; then
         read -r -p "Initial mode — 'dark', 'light' or 'auto' [dark]: " MODE || true
@@ -90,14 +99,15 @@ if [[ -z "${MODE:-}" ]]; then
 fi
 
 echo
-info "wallpaper=$WALLPAPER icons=$ICONS buttons-left=$BUTTONS_LEFT macos-layout=$MACOS_LAYOUT hide-xwvb=$HIDE_XWVB cycle=$CYCLE mode=$MODE"
+info "wallpaper=$WALLPAPER icons=$ICONS buttons-left=$BUTTONS_LEFT macos-layout=$MACOS_LAYOUT hide-xwvb=$HIDE_XWVB cycle=$CYCLE konsole=$KONSOLE dracula=$DRACULA mode=$MODE"
 echo
 
 # ── Packages ────────────────────────────────────────────────────────────────
 
 PKGS=(fonts-inter qt-style-kvantum qt-style-kvantum-themes)
-[[ "$WALLPAPER" != "skip" ]] && PKGS+=(curl)
+[[ "$WALLPAPER" != "skip" || "$KONSOLE" == "yes" ]] && PKGS+=(curl)
 [[ "$ICONS" == "yes" ]] && PKGS+=(git)
+[[ "$KONSOLE" == "yes" ]] && PKGS+=(fonts-hack)
 MISSING=()
 for p in "${PKGS[@]}"; do
     dpkg -s "$p" >/dev/null 2>&1 || MISSING+=("$p")
@@ -124,8 +134,11 @@ case "$WALLPAPER" in
         warn "Wallpaper skipped — the theme will keep your current one."
         ;;
     nebula)
-        info "Downloading the nebula wallpaper (Starkiteckt on wallhaven)..."
-        curl -fL --retry 2 -o "$WALL" "https://w.wallhaven.cc/full/ml/wallhaven-mlgmjm.png" \
+        info "Downloading the nebula wallpaper..."
+        # Mirrored in this repository so the theme survives the source going
+        # away; original: https://wallhaven.cc/w/mlgmjm
+        curl -fL --retry 2 -o "$WALL" "$RAW_BASE/assets/debianadera-space.png" \
+            || curl -fL --retry 2 -o "$WALL" "https://w.wallhaven.cc/full/ml/wallhaven-mlgmjm.png" \
             || warn "Download failed — wallpaper skipped, set one manually later."
         ;;
     http*)
@@ -692,6 +705,37 @@ if fc-list 2>/dev/null | grep -qi "Inter:style\|Inter,"; then
     kwriteconfig6 --file kdeglobals --group WM --key activeFont "Inter,10,-1,5,500,0,0,0,0,0,0,0,0,0,0,1"
 else
     warn "Inter font not found — keeping current fonts."
+fi
+
+# ── Konsole: Dracula color scheme and profile ───────────────────────────────
+# https://draculatheme.com — MIT licensed, mirrored in this repository.
+
+if [[ "$KONSOLE" == "yes" ]]; then
+    info "Installing the Dracula Konsole theme..."
+    mkdir -p "$HOME/.local/share/konsole"
+    KONSOLE_OK=yes
+    for f in "Dracula.colorscheme" "Dracula.profile" "Dracula Storm.colorscheme" "Dracula Storm.profile"; do
+        curl -fL --retry 2 -o "$HOME/.local/share/konsole/$f" "$RAW_BASE/assets/konsole/${f// /%20}" \
+            || { warn "Could not download $f"; KONSOLE_OK=no; }
+    done
+    if [[ "$KONSOLE_OK" == "yes" ]]; then
+        kwriteconfig6 --file konsolerc --group "Desktop Entry" --key DefaultProfile "Dracula.profile"
+        info "Dracula set as the default Konsole profile."
+    fi
+fi
+
+# ── VS Code / VSCodium: Dracula theme extension ─────────────────────────────
+# https://marketplace.visualstudio.com/items?itemName=dracula-theme.theme-dracula
+
+if [[ "$DRACULA" == "yes" ]]; then
+    for editor in code codium; do
+        if command -v "$editor" >/dev/null; then
+            info "Installing the Dracula extension in $editor..."
+            "$editor" --install-extension dracula-theme.theme-dracula --force >/dev/null \
+                && info "Done — pick 'Dracula Theme' in $editor via Ctrl+K Ctrl+T." \
+                || warn "Extension install failed in $editor (marketplace unreachable?)."
+        fi
+    done
 fi
 
 # ── Window buttons on the left (macOS order) ────────────────────────────────
