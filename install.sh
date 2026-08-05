@@ -14,7 +14,8 @@
 #          Run as your normal user (sudo is only invoked for apt).
 #          Every choice can be preseeded via environment variables, e.g.:
 #          WALLPAPER=nebula ICONS=yes MACOS_LAYOUT=yes BUTTONS_LEFT=yes \
-#          CYCLE=no KONSOLE=yes DRACULA=yes MODE=dark bash install.sh
+#          CYCLE=no KONSOLE=yes DRACULA=yes CLOCK_SIZE=15 CLOCK_DATE=eu \
+#          CLOCK_24H=yes MODE=dark bash install.sh
 #
 # What it touches (all user-level, nothing outside $HOME except apt):
 #   ~/.local/share/color-schemes/Debianadera{Light,Dark}.colors
@@ -97,9 +98,40 @@ if [[ -z "${MODE:-}" ]]; then
     fi
     MODE="${MODE:-dark}"
 fi
+# Clock font size in the top bar (macOS layout only): a point size, or 'auto'
+# to keep Plasma's automatic two-line sizing.
+if [[ "$MACOS_LAYOUT" == "yes" && -z "${CLOCK_SIZE:-}" ]]; then
+    if [[ -t 0 ]]; then
+        read -r -p "Top bar clock font size (8-24, or 'auto') [15]: " CLOCK_SIZE || true
+    fi
+    CLOCK_SIZE="${CLOCK_SIZE:-15}"
+fi
+CLOCK_SIZE="${CLOCK_SIZE:-auto}"
+if [[ "$CLOCK_SIZE" != "auto" ]] && ! [[ "$CLOCK_SIZE" =~ ^[0-9]+$ && "$CLOCK_SIZE" -ge 8 && "$CLOCK_SIZE" -le 24 ]]; then
+    warn "Invalid clock size '$CLOCK_SIZE' — using 15."
+    CLOCK_SIZE=15
+fi
+# Date format shown by the clock: 'locale' keeps the system default, 'eu' is
+# day/month/year, 'iso' is year-month-day, anything else is a custom Qt
+# date format string (https://doc.qt.io/qt-6/qdate.html#toString).
+if [[ "$MACOS_LAYOUT" == "yes" && -z "${CLOCK_DATE:-}" ]]; then
+    if [[ -t 0 ]]; then
+        read -r -p "Clock date format — 'locale', 'eu' (dd/MM/yy), 'iso', or custom [locale]: " CLOCK_DATE || true
+    fi
+    CLOCK_DATE="${CLOCK_DATE:-locale}"
+fi
+CLOCK_DATE="${CLOCK_DATE:-locale}"
+# 24-hour time: 'locale' keeps the system default, 'yes' forces 24h.
+if [[ "$MACOS_LAYOUT" == "yes" && -z "${CLOCK_24H:-}" ]]; then
+    if [[ -t 0 ]]; then
+        read -r -p "Force 24-hour time — 'yes' or 'locale' [locale]: " CLOCK_24H || true
+    fi
+    CLOCK_24H="${CLOCK_24H:-locale}"
+fi
+CLOCK_24H="${CLOCK_24H:-locale}"
 
 echo
-info "wallpaper=$WALLPAPER icons=$ICONS buttons-left=$BUTTONS_LEFT macos-layout=$MACOS_LAYOUT hide-xwvb=$HIDE_XWVB cycle=$CYCLE konsole=$KONSOLE dracula=$DRACULA mode=$MODE"
+info "wallpaper=$WALLPAPER icons=$ICONS buttons-left=$BUTTONS_LEFT macos-layout=$MACOS_LAYOUT hide-xwvb=$HIDE_XWVB cycle=$CYCLE konsole=$KONSOLE dracula=$DRACULA clock-size=${CLOCK_SIZE:-auto} mode=$MODE"
 echo
 
 # ── Packages ────────────────────────────────────────────────────────────────
@@ -803,6 +835,40 @@ if [[ "$MACOS_LAYOUT" == "yes" ]]; then
             top.addWidget("org.kde.plasma.digitalclock");
         }
     '
+    # Clock appearance. A fixed size only reads well on one line, so the date
+    # moves beside the time (two stacked lines stay tiny in a 30 px bar).
+    CLOCK_JS=""
+    if [[ "$CLOCK_SIZE" != "auto" ]]; then
+        CLOCK_JS+="w.writeConfig('autoFontAndSize', false);"
+        CLOCK_JS+="w.writeConfig('fontFamily', 'Inter');"
+        CLOCK_JS+="w.writeConfig('fontSize', $CLOCK_SIZE);"
+        CLOCK_JS+="w.writeConfig('fontWeight', 500);"
+        CLOCK_JS+="w.writeConfig('dateDisplayFormat', 'BesideTime');"
+    fi
+    case "$CLOCK_DATE" in
+        locale) ;;
+        eu)  CLOCK_JS+="w.writeConfig('dateFormat', 'custom');w.writeConfig('customDateFormat', 'dd/MM/yy');" ;;
+        iso) CLOCK_JS+="w.writeConfig('dateFormat', 'isoDate');" ;;
+        *)   CLOCK_JS+="w.writeConfig('dateFormat', 'custom');w.writeConfig('customDateFormat', '$CLOCK_DATE');" ;;
+    esac
+    [[ "$CLOCK_24H" == "yes" ]] && CLOCK_JS+="w.writeConfig('use24hFormat', 2);"
+    if [[ -n "$CLOCK_JS" ]]; then
+        qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "
+            var pl = panels();
+            for (var i = 0; i < pl.length; i++) {
+                if (pl[i].location != 'top') continue;
+                var ws = pl[i].widgets();
+                for (var j = 0; j < ws.length; j++) {
+                    if (ws[j].type == 'org.kde.plasma.digitalclock') {
+                        var w = ws[j];
+                        w.currentConfigGroup = ['Appearance'];
+                        $CLOCK_JS
+                        w.reloadConfig();
+                    }
+                }
+            }
+        "
+    fi
 fi
 
 # ── Apply ───────────────────────────────────────────────────────────────────

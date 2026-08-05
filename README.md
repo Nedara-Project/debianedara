@@ -55,9 +55,13 @@ HIDE_XWVB=yes CYCLE=no MODE=dark bash install.sh
 | `CYCLE`        | `yes` / `no`                    | `no`     | Automatic day/night switching                  |
 | `KONSOLE`      | `yes` / `no`                    | `yes`    | Dracula color scheme + profile for Konsole     |
 | `DRACULA`      | `yes` / `no`                    | `yes`*   | Dracula extension for VS Code/VSCodium         |
+| `CLOCK_SIZE`   | `8`–`24` or `auto`              | `15`†    | Top bar clock font size (one-line date+time)   |
+| `CLOCK_DATE`   | `locale` / `eu` / `iso` / custom| `locale`†| Clock date format (`eu` = dd/MM/yy; custom = any [Qt format](https://doc.qt.io/qt-6/qdate.html#toString)) |
+| `CLOCK_24H`    | `yes` / `locale`                | `locale`†| Force 24-hour time on the clock                |
 | `MODE`         | `dark` / `light` / `auto`       | `dark`   | Mode applied at the end of the install         |
 
 \* only offered when `code` or `codium` is found on the machine.
+† only asked/applied with `MACOS_LAYOUT=yes` (they configure the top bar clock).
 
 Log out and back in afterwards so every application picks up the fonts and
 widget style.
