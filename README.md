@@ -28,7 +28,7 @@ nebula-blue accent, and an optional macOS-like layout.
 ## Install
 
 ```sh
-bash <(curl -sL https://raw.githubusercontent.com/YOUR_USERNAME/debianadera/main/install.sh)
+bash <(curl -sL https://raw.githubusercontent.com/Nedara-Project/debianedara/main/install.sh)
 ```
 
 Run as your normal user — `sudo` is only invoked for `apt`. The script asks a
