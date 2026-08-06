@@ -4,6 +4,11 @@ An elegant KDE Plasma 6 theme with a deep-space identity, built for
 **Debian 13 (trixie) + Plasma 6.3** — light and dark variants, a luminous
 nebula-blue accent, and an optional macOS-like layout.
 
+[![Debianadera desktop — dark mode, macOS-like layout](assets/desktop-example-preview.jpg)](assets/desktop-example.png)
+
+*Dark mode with the macOS-like layout: thin top bar, centered floating dock —
+click for full resolution.*
+
 ## What you get
 
 - **Two color schemes** — *Debianadera Dark* (deep-space navy, `#0B0E17`–`#10131E`)
