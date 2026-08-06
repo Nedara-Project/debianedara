@@ -87,6 +87,7 @@ ask MACOS_LAYOUT "Apply the macOS-like panel layout (thin top bar + centered doc
 ask HIDE_XWVB    "Hide the Xwayland Video Bridge ghost window (fixes edge artifact)?"    yes
 ask CYCLE        "Enable the automatic day/night cycle (light 07:00-19:00)?"             no
 ask KONSOLE      "Install the Dracula color scheme and profile for Konsole?"             yes
+ask CLIPBOARD    "Keep the clipboard manager (Klipper) in the system tray?"              yes
 if command -v code >/dev/null || command -v codium >/dev/null; then
     ask DRACULA  "Install the Dracula theme extension in VS Code/VSCodium?"              yes
 else
@@ -131,7 +132,7 @@ fi
 CLOCK_24H="${CLOCK_24H:-locale}"
 
 echo
-info "wallpaper=$WALLPAPER icons=$ICONS buttons-left=$BUTTONS_LEFT macos-layout=$MACOS_LAYOUT hide-xwvb=$HIDE_XWVB cycle=$CYCLE konsole=$KONSOLE dracula=$DRACULA clock-size=${CLOCK_SIZE:-auto} mode=$MODE"
+info "wallpaper=$WALLPAPER icons=$ICONS buttons-left=$BUTTONS_LEFT macos-layout=$MACOS_LAYOUT hide-xwvb=$HIDE_XWVB cycle=$CYCLE konsole=$KONSOLE clipboard=$CLIPBOARD dracula=$DRACULA clock-size=${CLOCK_SIZE:-auto} mode=$MODE"
 echo
 
 # ── Packages ────────────────────────────────────────────────────────────────
@@ -869,6 +870,71 @@ if [[ "$MACOS_LAYOUT" == "yes" ]]; then
             }
         "
     fi
+fi
+
+# ── Clipboard manager (Klipper) ─────────────────────────────────────────────
+# The clipboard applet lives inside the system tray's own containment, which
+# plasmashell scripting cannot reach — so opting out edits the panel config
+# directly (with plasmashell stopped, or it would overwrite the file on exit).
+
+if [[ "$CLIPBOARD" == "no" ]]; then
+    info "Removing the clipboard manager from the system tray..."
+    APPLETSRC="$HOME/.config/plasma-org.kde.plasma.desktop-appletsrc"
+    systemctl --user stop plasma-plasmashell 2>/dev/null || true
+    python3 - "$APPLETSRC" <<'EOF'
+import re, sys
+
+path = sys.argv[1]
+with open(path) as f:
+    lines = f.readlines()
+
+# Containment ids whose plugin is the system tray
+tray_ids, section = set(), None
+for line in lines:
+    m = re.match(r'\[Containments\]\[(\d+)\]\n?$', line)
+    if m:
+        section = m.group(1)
+    elif line.startswith('['):
+        section = None
+    elif section and line.strip() == 'plugin=org.kde.plasma.private.systemtray':
+        tray_ids.add(section)
+
+CLIP = 'org.kde.plasma.clipboard'
+out, in_general, seen_hidden = [], None, set()
+for line in lines:
+    m = re.match(r'\[Containments\]\[(\d+)\]\[General\]\n?$', line)
+    if m and m.group(1) in tray_ids:
+        in_general = m.group(1)
+        out.append(line)
+        continue
+    if line.startswith('['):
+        if in_general and in_general not in seen_hidden:
+            out.append(f'hiddenItems={CLIP}\n')
+            seen_hidden.add(in_general)
+        in_general = None
+        out.append(line)
+        continue
+    if in_general:
+        key = line.split('=', 1)[0]
+        if key in ('extraItems', 'knownItems'):
+            items = [i for i in line.split('=', 1)[1].strip().split(',') if i and i != CLIP]
+            out.append(f'{key}={",".join(items)}\n')
+            continue
+        if key == 'hiddenItems':
+            items = [i for i in line.split('=', 1)[1].strip().split(',') if i]
+            if CLIP not in items:
+                items.append(CLIP)
+            out.append(f'{key}={",".join(items)}\n')
+            seen_hidden.add(in_general)
+            continue
+    out.append(line)
+if in_general and in_general not in seen_hidden:
+    out.append(f'hiddenItems={CLIP}\n')
+
+with open(path, 'w') as f:
+    f.writelines(out)
+EOF
+    systemctl --user start plasma-plasmashell 2>/dev/null || true
 fi
 
 # ── Apply ───────────────────────────────────────────────────────────────────

@@ -59,6 +59,7 @@ HIDE_XWVB=yes CYCLE=no MODE=dark bash install.sh
 | `HIDE_XWVB`    | `yes` / `no`                    | `yes`    | Hide the Xwayland Video Bridge ghost window    |
 | `CYCLE`        | `yes` / `no`                    | `no`     | Automatic day/night switching                  |
 | `KONSOLE`      | `yes` / `no`                    | `yes`    | Dracula color scheme + profile for Konsole     |
+| `CLIPBOARD`    | `yes` / `no`                    | `yes`    | Keep the [Klipper](https://userbase.kde.org/Klipper) clipboard manager in the tray |
 | `DRACULA`      | `yes` / `no`                    | `yes`*   | Dracula extension for VS Code/VSCodium         |
 | `CLOCK_SIZE`   | `8`–`24` or `auto`              | `15`†    | Top bar clock font size (one-line date+time)   |
 | `CLOCK_DATE`   | `locale` / `eu` / `iso` / custom| `locale`†| Clock date format (`eu` = dd/MM/yy; custom = any [Qt format](https://doc.qt.io/qt-6/qdate.html#toString)) |
