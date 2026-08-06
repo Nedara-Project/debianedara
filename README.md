@@ -1,18 +1,18 @@
-# Debianadera
+# Debianedara
 
 An elegant KDE Plasma 6 theme with a deep-space identity, built for
 **Debian 13 (trixie) + Plasma 6.3** — light and dark variants, a luminous
 nebula-blue accent, and an optional macOS-like layout.
 
-[![Debianadera desktop — dark mode, macOS-like layout](assets/desktop-example-preview.jpg)](assets/desktop-example.png)
+[![Debianedara desktop — dark mode, macOS-like layout](assets/desktop-example-preview.jpg)](assets/desktop-example.png)
 
 *Dark mode with the macOS-like layout: thin top bar, centered floating dock —
 click for full resolution.*
 
 ## What you get
 
-- **Two color schemes** — *Debianadera Dark* (deep-space navy, `#0B0E17`–`#10131E`)
-  and *Debianadera Light* (cool paper whites), both accented with nebula blue
+- **Two color schemes** — *Debianedara Dark* (deep-space navy, `#0B0E17`–`#10131E`)
+  and *Debianedara Light* (cool paper whites), both accented with nebula blue
 - **Two global themes** (Look and Feel packages) selectable in System Settings
 - **Matching Kvantum widget themes** — flat & modern, blurred translucent menus,
   derived from KvFlat at install time
@@ -74,28 +74,28 @@ widget style.
 ## Daily use
 
 ```sh
-debianadera-mode dark     # switch to dark
-debianadera-mode light    # switch to light
-debianadera-mode auto     # pick by time of day (light 07:00-19:00)
+debianedara-mode dark     # switch to dark
+debianedara-mode light    # switch to light
+debianedara-mode auto     # pick by time of day (light 07:00-19:00)
 
-systemctl --user enable --now debianadera.timer    # turn the cycle on
-systemctl --user disable --now debianadera.timer   # turn it off
+systemctl --user enable --now debianedara.timer    # turn the cycle on
+systemctl --user disable --now debianedara.timer   # turn it off
 ```
 
 ## Uninstall
 
 ```sh
-systemctl --user disable --now debianadera.timer 2>/dev/null
-rm -rf ~/.local/share/color-schemes/Debianadera*.colors \
-       ~/.local/share/plasma/look-and-feel/org.debianadera.* \
-       ~/.config/Kvantum/Debianadera* \
-       ~/.local/share/wallpapers/debianadera-space.png \
-       ~/.local/bin/debianadera-mode \
-       ~/.config/systemd/user/debianadera.* \
-       ~/.config/autostart/debianadera.desktop
+systemctl --user disable --now debianedara.timer 2>/dev/null
+rm -rf ~/.local/share/color-schemes/Debianedara*.colors \
+       ~/.local/share/plasma/look-and-feel/org.debianedara.* \
+       ~/.config/Kvantum/Debianedara* \
+       ~/.local/share/wallpapers/debianedara-space.png \
+       ~/.local/bin/debianedara-mode \
+       ~/.config/systemd/user/debianedara.* \
+       ~/.config/autostart/debianedara.desktop
 # then pick another Global Theme in System Settings, and restore the panel
 # layout backup if you applied the macOS layout:
-#   cp ~/.config/plasma-org.kde.plasma.desktop-appletsrc.debianadera-backup \
+#   cp ~/.config/plasma-org.kde.plasma.desktop-appletsrc.debianedara-backup \
 #      ~/.config/plasma-org.kde.plasma.desktop-appletsrc
 #   systemctl --user restart plasma-plasmashell
 ```
@@ -118,7 +118,7 @@ rm -rf ~/.local/share/color-schemes/Debianadera*.colors \
   MIT licensed, by Zeno Rocha and contributors.
 - **[Tela-circle icons](https://github.com/vinceliuice/Tela-circle-icon-theme)**
   by vinceliuice, cloned from the official repository at install time.
-- **[Kvantum](https://github.com/tsujan/Kvantum)** by Tsu Jan — the Debianadera
+- **[Kvantum](https://github.com/tsujan/Kvantum)** by Tsu Jan — the Debianedara
   widget themes are generated locally from its KvFlat/KvFlatLight themes.
 
 ## License

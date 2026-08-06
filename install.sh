@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════════════
-# Debianadera — an elegant KDE Plasma 6 theme with a deep-space identity
+# Debianedara — an elegant KDE Plasma 6 theme with a deep-space identity
 #
 # Light + dark color schemes with a luminous nebula-blue accent, matching
 # Kvantum widget themes (flat, blurred translucent menus), a nebula wallpaper,
@@ -18,13 +18,13 @@
 #          CLOCK_24H=yes MODE=dark bash install.sh
 #
 # What it touches (all user-level, nothing outside $HOME except apt):
-#   ~/.local/share/color-schemes/Debianadera{Light,Dark}.colors
-#   ~/.local/share/plasma/look-and-feel/org.debianadera.{light,dark}/
-#   ~/.config/Kvantum/Debianadera{Light,Dark}/   + kvantum.kvconfig
-#   ~/.local/share/wallpapers/debianadera-space.png
-#   ~/.local/bin/debianadera-mode
-#   ~/.config/systemd/user/debianadera.{service,timer}
-#   ~/.config/autostart/debianadera.desktop        (only if cycle enabled)
+#   ~/.local/share/color-schemes/Debianedara{Light,Dark}.colors
+#   ~/.local/share/plasma/look-and-feel/org.debianedara.{light,dark}/
+#   ~/.config/Kvantum/Debianedara{Light,Dark}/   + kvantum.kvconfig
+#   ~/.local/share/wallpapers/debianedara-space.png
+#   ~/.local/bin/debianedara-mode
+#   ~/.config/systemd/user/debianedara.{service,timer}
+#   ~/.config/autostart/debianedara.desktop        (only if cycle enabled)
 #   ~/.config/kdeglobals, kwinrulesrc, kscreenlockerrc (via kwriteconfig6)
 #   Panel layout via plasmashell scripting          (only if chosen)
 #
@@ -71,7 +71,7 @@ info "Detected Plasma $PLASMA_VERSION"
 # ── Choices ─────────────────────────────────────────────────────────────────
 
 echo
-echo "Debianadera installer — answer a few questions (Enter = default):"
+echo "Debianedara installer — answer a few questions (Enter = default):"
 echo
 
 # WALLPAPER: nebula (download) | path/URL to your own image | skip
@@ -160,7 +160,7 @@ mkdir -p "$HOME/.local/share/color-schemes" \
 
 # ── Wallpaper ───────────────────────────────────────────────────────────────
 
-WALL="$HOME/.local/share/wallpapers/debianadera-space.png"
+WALL="$HOME/.local/share/wallpapers/debianedara-space.png"
 case "$WALLPAPER" in
     skip)
         warn "Wallpaper skipped — the theme will keep your current one."
@@ -169,7 +169,7 @@ case "$WALLPAPER" in
         info "Downloading the nebula wallpaper..."
         # Mirrored in this repository so the theme survives the source going
         # away; original: https://wallhaven.cc/w/mlgmjm
-        curl -fL --retry 2 -o "$WALL" "$RAW_BASE/assets/debianadera-space.png" \
+        curl -fL --retry 2 -o "$WALL" "$RAW_BASE/assets/debianedara-space.png" \
             || curl -fL --retry 2 -o "$WALL" "https://w.wallhaven.cc/full/ml/wallhaven-mlgmjm.png" \
             || warn "Download failed — wallpaper skipped, set one manually later."
         ;;
@@ -200,8 +200,8 @@ fi
 
 info "Installing color schemes..."
 
-cat > "$HOME/.local/share/color-schemes/DebianaderaDark.colors" <<'EOF'
-# Debianadera Dark — deep-space navy scheme with a luminous nebula-blue accent
+cat > "$HOME/.local/share/color-schemes/DebianedaraDark.colors" <<'EOF'
+# Debianedara Dark — deep-space navy scheme with a luminous nebula-blue accent
 # Generated for KDE Plasma 6
 
 [ColorEffects:Disabled]
@@ -337,8 +337,8 @@ ForegroundPositive=94,199,132
 ForegroundVisited=176,138,230
 
 [General]
-ColorScheme=DebianaderaDark
-Name=Debianadera Dark
+ColorScheme=DebianedaraDark
+Name=Debianedara Dark
 shadeSortColumn=true
 
 [KDE]
@@ -353,8 +353,8 @@ inactiveBlend=16,19,30
 inactiveForeground=126,134,160
 EOF
 
-cat > "$HOME/.local/share/color-schemes/DebianaderaLight.colors" <<'EOF'
-# Debianadera Light — cool paper scheme with a deep nebula-blue accent
+cat > "$HOME/.local/share/color-schemes/DebianedaraLight.colors" <<'EOF'
+# Debianedara Light — cool paper scheme with a deep nebula-blue accent
 # Generated for KDE Plasma 6
 
 [ColorEffects:Disabled]
@@ -490,8 +490,8 @@ ForegroundPositive=24,132,74
 ForegroundVisited=106,90,205
 
 [General]
-ColorScheme=DebianaderaLight
-Name=Debianadera Light
+ColorScheme=DebianedaraLight
+Name=Debianedara Light
 shadeSortColumn=true
 
 [KDE]
@@ -513,15 +513,15 @@ info "Building Kvantum themes..."
 
 OPAQUE="kaffeine kmplayer subtitlecomposer kdenlive vlc smplayer smplayer2 avidemux kamoso QtCreator VirtualBox trojita mediainfo-gui qmlscene qml plasmashell krunner ksmserver kscreenlocker_greet"
 
-rm -rf "$HOME/.config/Kvantum/DebianaderaDark" "$HOME/.config/Kvantum/DebianaderaLight"
-cp -r /usr/share/Kvantum/KvFlat "$HOME/.config/Kvantum/DebianaderaDark"
-mv "$HOME/.config/Kvantum/DebianaderaDark/KvFlat.kvconfig" "$HOME/.config/Kvantum/DebianaderaDark/DebianaderaDark.kvconfig"
-mv "$HOME/.config/Kvantum/DebianaderaDark/KvFlat.svg" "$HOME/.config/Kvantum/DebianaderaDark/DebianaderaDark.svg"
-cp -r /usr/share/Kvantum/KvFlatLight "$HOME/.config/Kvantum/DebianaderaLight"
-mv "$HOME/.config/Kvantum/DebianaderaLight/KvFlatLight.kvconfig" "$HOME/.config/Kvantum/DebianaderaLight/DebianaderaLight.kvconfig"
-mv "$HOME/.config/Kvantum/DebianaderaLight/KvFlatLight.svg" "$HOME/.config/Kvantum/DebianaderaLight/DebianaderaLight.svg"
+rm -rf "$HOME/.config/Kvantum/DebianedaraDark" "$HOME/.config/Kvantum/DebianedaraLight"
+cp -r /usr/share/Kvantum/KvFlat "$HOME/.config/Kvantum/DebianedaraDark"
+mv "$HOME/.config/Kvantum/DebianedaraDark/KvFlat.kvconfig" "$HOME/.config/Kvantum/DebianedaraDark/DebianedaraDark.kvconfig"
+mv "$HOME/.config/Kvantum/DebianedaraDark/KvFlat.svg" "$HOME/.config/Kvantum/DebianedaraDark/DebianedaraDark.svg"
+cp -r /usr/share/Kvantum/KvFlatLight "$HOME/.config/Kvantum/DebianedaraLight"
+mv "$HOME/.config/Kvantum/DebianedaraLight/KvFlatLight.kvconfig" "$HOME/.config/Kvantum/DebianedaraLight/DebianedaraLight.kvconfig"
+mv "$HOME/.config/Kvantum/DebianedaraLight/KvFlatLight.svg" "$HOME/.config/Kvantum/DebianedaraLight/DebianedaraLight.svg"
 
-D="$HOME/.config/Kvantum/DebianaderaDark/DebianaderaDark.kvconfig"
+D="$HOME/.config/Kvantum/DebianedaraDark/DebianedaraDark.kvconfig"
 sed -i \
  -e 's/^window\.color=.*/window.color=#10131E/' \
  -e 's/^base\.color=.*/base.color=#0B0E17/' \
@@ -540,11 +540,11 @@ sed -i \
  -e 's/^tooltip\.text\.color=.*/tooltip.text.color=#D5D9E6/' \
  -e 's/^link\.color=.*/link.color=#6FC7FF/' \
  -e 's/^link\.visited\.color=.*/link.visited.color=#B08AE6/' \
- -e 's/^comment=.*/comment=Debianadera Dark — flat, translucent menus/' \
- -e 's/^author=.*/author=Debianadera/' \
+ -e 's/^comment=.*/comment=Debianedara Dark — flat, translucent menus/' \
+ -e 's/^author=.*/author=Debianedara/' \
  -e 's/^menu_shadow_depth=.*/menu_shadow_depth=20/' "$D"
 
-L="$HOME/.config/Kvantum/DebianaderaLight/DebianaderaLight.kvconfig"
+L="$HOME/.config/Kvantum/DebianedaraLight/DebianedaraLight.kvconfig"
 sed -i \
  -e 's/^window\.color=.*/window.color=#F0F2F6/' \
  -e 's/^base\.color=.*/base.color=#FBFCFE/' \
@@ -560,8 +560,8 @@ sed -i \
  -e 's/^button\.text\.color=.*/button.text.color=#21242E/' \
  -e 's/^link\.color=.*/link.color=#1B66C9/' \
  -e 's/^link\.visited\.color=.*/link.visited.color=#8854B5/' \
- -e 's/^comment=.*/comment=Debianadera Light — flat, translucent menus/' \
- -e 's/^author=.*/author=Debianadera/' \
+ -e 's/^comment=.*/comment=Debianedara Light — flat, translucent menus/' \
+ -e 's/^author=.*/author=Debianedara/' \
  -e 's/^menu_shadow_depth=.*/menu_shadow_depth=20/' "$L"
 
 # Blurred translucent popups; windows themselves stay opaque (and Kvantum
@@ -579,18 +579,18 @@ ICON_LIGHT=breeze; ICON_DARK=breeze-dark
 [[ "$ICONS" == "yes" ]] && { ICON_LIGHT=Tela-circle; ICON_DARK=Tela-circle-dark; }
 
 for v in light dark; do
-    LNF="$HOME/.local/share/plasma/look-and-feel/org.debianadera.$v"
+    LNF="$HOME/.local/share/plasma/look-and-feel/org.debianedara.$v"
     mkdir -p "$LNF/contents/previews"
-    if [[ "$v" == "light" ]]; then NAME="Debianadera Light"; SCHEME=DebianaderaLight; ICON=$ICON_LIGHT
-    else NAME="Debianadera Dark"; SCHEME=DebianaderaDark; ICON=$ICON_DARK; fi
+    if [[ "$v" == "light" ]]; then NAME="Debianedara Light"; SCHEME=DebianedaraLight; ICON=$ICON_LIGHT
+    else NAME="Debianedara Dark"; SCHEME=DebianedaraDark; ICON=$ICON_DARK; fi
 
     cat > "$LNF/metadata.json" <<EOF
 {
     "KPlugin": {
-        "Id": "org.debianadera.$v",
+        "Id": "org.debianedara.$v",
         "Name": "$NAME",
         "Description": "Elegant deep-space theme with a luminous nebula-blue accent",
-        "Authors": [ { "Name": "Debianadera" } ],
+        "Authors": [ { "Name": "Debianedara" } ],
         "Category": "",
         "License": "MIT",
         "Version": "1.0"
@@ -631,11 +631,11 @@ done
 
 # ── Day/night switcher script ───────────────────────────────────────────────
 
-info "Installing debianadera-mode..."
-cat > "$HOME/.local/bin/debianadera-mode" <<'EOF'
+info "Installing debianedara-mode..."
+cat > "$HOME/.local/bin/debianedara-mode" <<'EOF'
 #!/usr/bin/env bash
-# Debianadera day/night switcher.
-# Usage: debianadera-mode [auto|light|dark]   (default: auto — light 07:00-19:00)
+# Debianedara day/night switcher.
+# Usage: debianedara-mode [auto|light|dark]   (default: auto — light 07:00-19:00)
 set -u
 
 MODE="${1:-auto}"
@@ -648,23 +648,23 @@ fi
 
 case "$MODE" in
     light)
-        SCHEME=DebianaderaLight
+        SCHEME=DebianedaraLight
         ICONS=Tela-circle
-        KVANTUM=DebianaderaLight
+        KVANTUM=DebianedaraLight
         ;;
     dark)
-        SCHEME=DebianaderaDark
+        SCHEME=DebianedaraDark
         ICONS=Tela-circle-dark
-        KVANTUM=DebianaderaDark
+        KVANTUM=DebianedaraDark
         ;;
     *)
-        echo "usage: debianadera-mode [auto|light|dark]" >&2
+        echo "usage: debianedara-mode [auto|light|dark]" >&2
         exit 1
         ;;
 esac
 
 # One wallpaper for both modes: the nebula is the theme's identity.
-WALL="$HOME/.local/share/wallpapers/debianadera-space.png"
+WALL="$HOME/.local/share/wallpapers/debianedara-space.png"
 
 # Skip if already in the right mode (avoids flicker when the timer fires)
 current=$(grep -m1 '^ColorScheme=' "$HOME/.config/kdeglobals" 2>/dev/null | cut -d= -f2)
@@ -683,22 +683,22 @@ if [[ -f "$WALL" ]]; then
     kwriteconfig6 --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key PreviewImage "file://$WALL"
 fi
 EOF
-chmod +x "$HOME/.local/bin/debianadera-mode"
+chmod +x "$HOME/.local/bin/debianedara-mode"
 
 # ── Day/night cycle units (installed always, enabled on request) ────────────
 
-cat > "$HOME/.config/systemd/user/debianadera.service" <<'EOF'
+cat > "$HOME/.config/systemd/user/debianedara.service" <<'EOF'
 [Unit]
-Description=Debianadera day/night switch
+Description=Debianedara day/night switch
 
 [Service]
 Type=oneshot
-ExecStart=%h/.local/bin/debianadera-mode auto
+ExecStart=%h/.local/bin/debianedara-mode auto
 EOF
 
-cat > "$HOME/.config/systemd/user/debianadera.timer" <<'EOF'
+cat > "$HOME/.config/systemd/user/debianedara.timer" <<'EOF'
 [Unit]
-Description=Debianadera day/night switch at 07:00 and 19:00
+Description=Debianedara day/night switch at 07:00 and 19:00
 
 [Timer]
 OnCalendar=*-*-* 07:00:00
@@ -711,19 +711,19 @@ EOF
 
 systemctl --user daemon-reload
 if [[ "$CYCLE" == "yes" ]]; then
-    systemctl --user enable --now debianadera.timer
-    cat > "$HOME/.config/autostart/debianadera.desktop" <<'EOF'
+    systemctl --user enable --now debianedara.timer
+    cat > "$HOME/.config/autostart/debianedara.desktop" <<'EOF'
 [Desktop Entry]
 Type=Application
-Name=Debianadera day/night mode
-Exec=debianadera-mode auto
+Name=Debianedara day/night mode
+Exec=debianedara-mode auto
 X-KDE-autostart-after=panel
 OnlyShowIn=KDE;
 EOF
     info "Day/night cycle enabled (timer + login autostart)."
 else
-    systemctl --user disable --now debianadera.timer 2>/dev/null || true
-    rm -f "$HOME/.config/autostart/debianadera.desktop"
+    systemctl --user disable --now debianedara.timer 2>/dev/null || true
+    rm -f "$HOME/.config/autostart/debianedara.desktop"
 fi
 
 # ── Fonts: Inter ────────────────────────────────────────────────────────────
@@ -800,9 +800,9 @@ fi
 # ── macOS-like panel layout ─────────────────────────────────────────────────
 
 if [[ "$MACOS_LAYOUT" == "yes" ]]; then
-    info "Applying the macOS-like layout (backup: ~/.config/plasma-org.kde.plasma.desktop-appletsrc.debianadera-backup)..."
+    info "Applying the macOS-like layout (backup: ~/.config/plasma-org.kde.plasma.desktop-appletsrc.debianedara-backup)..."
     cp "$HOME/.config/plasma-org.kde.plasma.desktop-appletsrc" \
-       "$HOME/.config/plasma-org.kde.plasma.desktop-appletsrc.debianadera-backup" 2>/dev/null || true
+       "$HOME/.config/plasma-org.kde.plasma.desktop-appletsrc.debianedara-backup" 2>/dev/null || true
     qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript '
         var pl = panels();
         var hasTop = false;
@@ -878,16 +878,16 @@ kwriteconfig6 --file kdeglobals --group KDE --key widgetStyle kvantum
 
 VARIANT=light
 [[ "$MODE" == "dark" ]] && VARIANT=dark
-plasma-apply-lookandfeel -a "org.debianadera.$VARIANT" 2>/dev/null || true
-FORCE=1 "$HOME/.local/bin/debianadera-mode" "$MODE"
+plasma-apply-lookandfeel -a "org.debianedara.$VARIANT" 2>/dev/null || true
+FORCE=1 "$HOME/.local/bin/debianedara-mode" "$MODE"
 qdbus6 org.kde.KWin /KWin org.kde.KWin.reconfigure 2>/dev/null || true
 
 echo
-info "Done! Debianadera is installed."
+info "Done! Debianedara is installed."
 echo "
-  Switch modes any time:   debianadera-mode light|dark|auto
-  Toggle the cycle:        systemctl --user enable|disable --now debianadera.timer
-  Restore panel layout:    cp ~/.config/plasma-org.kde.plasma.desktop-appletsrc.debianadera-backup \\
+  Switch modes any time:   debianedara-mode light|dark|auto
+  Toggle the cycle:        systemctl --user enable|disable --now debianedara.timer
+  Restore panel layout:    cp ~/.config/plasma-org.kde.plasma.desktop-appletsrc.debianedara-backup \\
                               ~/.config/plasma-org.kde.plasma.desktop-appletsrc && systemctl --user restart plasma-plasmashell
   Log out and back in for every application to pick up the fonts and style.
 
