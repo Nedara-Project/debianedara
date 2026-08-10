@@ -62,7 +62,7 @@ HIDE_XWVB=yes CYCLE=no MODE=dark bash install.sh
 | `CLIPBOARD`    | `yes` / `no`                    | `yes`    | Keep the [Klipper](https://userbase.kde.org/Klipper) clipboard manager in the tray |
 | `DRACULA`      | `yes` / `no`                    | `yes`*   | Dracula extension for VS Code/VSCodium         |
 | `CLOCK_SIZE`   | `8`–`24` or `auto`              | `15`†    | Top bar clock font size (one-line date+time)   |
-| `CLOCK_DATE`   | `locale` / `eu` / `iso` / custom| `locale`†| Clock date format (`eu` = dd/MM/yy; custom = any [Qt format](https://doc.qt.io/qt-6/qdate.html#toString)) |
+| `CLOCK_DATE`   | `macos` / `locale` / `eu` / `iso` / custom| `macos`†| Clock date format (`macos` = `Mon Apr 1`, ordered to match the locale; `eu` = dd/MM/yy; custom = any [Qt format](https://doc.qt.io/qt-6/qdate.html#toString)) |
 | `CLOCK_24H`    | `yes` / `locale`                | `locale`†| Force 24-hour time on the clock                |
 | `MODE`         | `dark` / `light` / `auto`       | `dark`   | Mode applied at the end of the install         |
 

@@ -14,7 +14,7 @@
 #          Run as your normal user (sudo is only invoked for apt).
 #          Every choice can be preseeded via environment variables, e.g.:
 #          WALLPAPER=nebula ICONS=yes MACOS_LAYOUT=yes BUTTONS_LEFT=yes \
-#          CYCLE=no KONSOLE=yes DRACULA=yes CLOCK_SIZE=15 CLOCK_DATE=eu \
+#          CYCLE=no KONSOLE=yes DRACULA=yes CLOCK_SIZE=15 CLOCK_DATE=macos \
 #          CLOCK_24H=yes MODE=dark bash install.sh
 #
 # What it touches (all user-level, nothing outside $HOME except apt):
@@ -112,14 +112,15 @@ if [[ "$CLOCK_SIZE" != "auto" ]] && ! [[ "$CLOCK_SIZE" =~ ^[0-9]+$ && "$CLOCK_SI
     warn "Invalid clock size '$CLOCK_SIZE' — using 15."
     CLOCK_SIZE=15
 fi
-# Date format shown by the clock: 'locale' keeps the system default, 'eu' is
-# day/month/year, 'iso' is year-month-day, anything else is a custom Qt
-# date format string (https://doc.qt.io/qt-6/qdate.html#toString).
+# Date format shown by the clock: 'macos' is the menu bar's weekday/month/day,
+# 'locale' keeps the system default, 'eu' is day/month/year, 'iso' is
+# year-month-day, anything else is a custom Qt date format string
+# (https://doc.qt.io/qt-6/qdate.html#toString).
 if [[ "$MACOS_LAYOUT" == "yes" && -z "${CLOCK_DATE:-}" ]]; then
     if [[ -t 0 ]]; then
-        read -r -p "Clock date format — 'locale', 'eu' (dd/MM/yy), 'iso', or custom [locale]: " CLOCK_DATE || true
+        read -r -p "Clock date format — 'macos' (Mon Apr 1), 'locale', 'eu' (dd/MM/yy), 'iso', or custom [macos]: " CLOCK_DATE || true
     fi
-    CLOCK_DATE="${CLOCK_DATE:-locale}"
+    CLOCK_DATE="${CLOCK_DATE:-macos}"
 fi
 CLOCK_DATE="${CLOCK_DATE:-locale}"
 # 24-hour time: 'locale' keeps the system default, 'yes' forces 24h.
@@ -846,11 +847,41 @@ if [[ "$MACOS_LAYOUT" == "yes" ]]; then
         CLOCK_JS+="w.writeConfig('fontWeight', 500);"
         CLOCK_JS+="w.writeConfig('dateDisplayFormat', 'BesideTime');"
     fi
+    # The macOS menu bar shows weekday, month and day beside the time — "Mon Apr
+    # 1 09:42 AM" in the US, "lun. 1 avr. 09:42" in Belgium. Qt translates ddd
+    # and MMM on its own but keeps the order it is given, so read that off the
+    # short date format of the locale. That locale is the one plasmashell runs
+    # with, not the one in plasma-localerc: the region settings only reach Qt
+    # once the session exports them, so ask the process itself when it is up.
+    macos_date_format() {
+        local pid vars loc order
+        pid="$(pgrep -u "$UID" -x plasmashell | head -n1)"
+        if [[ -n "$pid" && -r "/proc/$pid/environ" ]]; then
+            vars="$(tr '\0' '\n' < "/proc/$pid/environ")"
+        else
+            vars="$(env)"
+        fi
+        for key in LC_ALL LC_TIME LANG; do
+            loc="$(grep -m1 "^$key=" <<< "$vars")" && break
+        done
+        order="$(LC_ALL="${loc#*=}" locale d_fmt 2>/dev/null \
+                 | sed 's|%F|%Y-%m-%d|g; s|%D|%m/%d/%y|g' \
+                 | grep -o '%-\?[a-zA-Z]' | tr -d '%-' | tr -cd 'dem')"
+        # 'd'/'e' first means day before month (fr, de), 'm' first the reverse
+        # (en_US, ja); an unknown locale falls back to the US order.
+        case "${order:0:1}" in
+            d|e) echo 'ddd d MMM' ;;
+            *)   echo 'ddd MMM d' ;;
+        esac
+    }
     case "$CLOCK_DATE" in
         locale) ;;
-        eu)  CLOCK_JS+="w.writeConfig('dateFormat', 'custom');w.writeConfig('customDateFormat', 'dd/MM/yy');" ;;
-        iso) CLOCK_JS+="w.writeConfig('dateFormat', 'isoDate');" ;;
-        *)   CLOCK_JS+="w.writeConfig('dateFormat', 'custom');w.writeConfig('customDateFormat', '$CLOCK_DATE');" ;;
+        macos)  CLOCK_JS+="w.writeConfig('dateFormat', 'custom');w.writeConfig('customDateFormat', '$(macos_date_format)');"
+                # the date belongs on the time's line, whatever the font size
+                CLOCK_JS+="w.writeConfig('dateDisplayFormat', 'BesideTime');" ;;
+        eu)     CLOCK_JS+="w.writeConfig('dateFormat', 'custom');w.writeConfig('customDateFormat', 'dd/MM/yy');" ;;
+        iso)    CLOCK_JS+="w.writeConfig('dateFormat', 'isoDate');" ;;
+        *)      CLOCK_JS+="w.writeConfig('dateFormat', 'custom');w.writeConfig('customDateFormat', '$CLOCK_DATE');" ;;
     esac
     [[ "$CLOCK_24H" == "yes" ]] && CLOCK_JS+="w.writeConfig('use24hFormat', 2);"
     if [[ -n "$CLOCK_JS" ]]; then
